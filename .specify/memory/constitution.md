@@ -1,23 +1,17 @@
 <!--
   SYNC IMPACT REPORT
   ==================
-  Version change: (unversioned) → 1.0.0
-  Modified principles: N/A (initial constitution)
-  Added sections:
-    - I. Mobile First
-    - II. Security First
-    - III. Intuitive UX
-    - IV. Monolithic N-Layer Architecture
-    - Quality & Testing Standards
-    - Development Workflow
-    - Governance
+  Version change: 1.0.0 → 1.1.0
+  Modified principles:
+    - II. Security First — added "PoC exemption" clause for end-user authentication
+  Added sections: N/A (clause added within existing Principle II)
   Removed sections: N/A
   Templates checked:
-    - .specify/templates/plan-template.md ✅ aligned (Constitution Check gate present)
-    - .specify/templates/spec-template.md ✅ aligned (mobile/security requirements will flow into FR/SC sections)
-    - .specify/templates/tasks-template.md ✅ aligned (security hardening and mobile tasks in Phase N)
+    - .specify/templates/plan-template.md ✅ aligned (Constitution Check gate records exemptions)
+    - .specify/templates/spec-template.md ✅ aligned (no structural change required)
+    - .specify/templates/tasks-template.md ✅ aligned (security hardening tasks unaffected)
   Deferred TODOs:
-    - RATIFICATION_DATE set to today (2026-06-24); update if project has an earlier adoption date.
+    - RATIFICATION_DATE remains 2026-06-24; update if project has an earlier adoption date.
 -->
 
 # LangGraph WebApp Constitution
@@ -48,6 +42,14 @@ Dependencies MUST be audited for known CVEs before each release (`npm audit` / `
 or equivalent with zero HIGH/CRITICAL threshold).
 Security-sensitive operations (auth, payments, data export) MUST produce structured audit log
 entries.
+
+**PoC exemption**: Features explicitly designated Proof-of-Concept MAY omit end-user
+authentication when ALL of the following hold: (a) the feature is single-user and non-public,
+(b) any non-public service boundary is still protected (e.g. a shared token between internal
+services), and (c) the exemption is recorded in the feature's plan Constitution Check. This
+exemption applies ONLY to end-user authentication — all other security requirements above
+(input validation, secret handling, HTTPS, dependency auditing, parameterised queries, audit
+logging) remain mandatory. Production (non-PoC) features retain the full authentication MUST.
 
 **Rationale**: A single security breach can destroy user trust and incur regulatory liability.
 Security controls applied retroactively are far more expensive than those built in from day one.
@@ -112,4 +114,4 @@ Amendments require: (1) documented rationale, (2) version bump per semantic vers
 All PRs and code reviews MUST verify compliance with the four core principles.
 Complexity deviations from Principle IV MUST be justified in the plan's Complexity Tracking table.
 
-**Version**: 1.0.0 | **Ratified**: 2026-06-24 | **Last Amended**: 2026-06-24
+**Version**: 1.1.0 | **Ratified**: 2026-06-24 | **Last Amended**: 2026-06-26

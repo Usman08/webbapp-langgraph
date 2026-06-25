@@ -81,11 +81,11 @@ Before the invoice is finalised, the operator must explicitly review and approve
 ### Edge Cases
 
 - What happens when the customer name in the request is ambiguous (partial match or multiple customers)?
-- When the AI cannot extract any meaningful intent from the request, the system MUST display an inline error message identifying the failure (e.g., "No customer found") and suggest a corrected phrasing example; the original input MUST remain editable so the operator can revise and resubmit without retyping from scratch.
+- What happens when the AI cannot extract any meaningful intent from the request? → See FR-019 (inline actionable error + suggested phrasing; input stays editable).
 - How does the system respond when there is no prior invoice for the customer (first-time order)?
 - What if the requested quantity increase results in a fractional unit count (e.g. 3 × 1.2 = 3.6 units)?
 - What happens when the AI cannot determine a "usual discount" because no discount rule exists for the customer?
-- What if all alternative products for an out-of-stock item are also out of stock? → The line item is retained in the draft with a "Back-Order / No Stock" flag; the operator decides at the approval gate whether to remove it or proceed with the back-order.
+- What if all alternative products for an out-of-stock item are also out of stock? → See FR-020 (line retained with "Back-Order / No Stock" flag; operator decides at the approval gate).
 
 ---
 
@@ -123,6 +123,7 @@ Before the invoice is finalised, the operator must explicitly review and approve
 - **Invoice**: ID, customer reference, date, line items, subtotal, discount applied, tax, total, status (Draft | Finalised). Operator rejection reverts status to Draft; there is no intermediate status.
 - **Invoice Line Item**: Product reference, quantity, unit price, line total.
 - **Discount Rule**: Customer type or customer ID, discount percentage, validity conditions.
+- **Workflow Run**: A single execution of the AI workflow for one request. Groups its Workflow Steps; links to the resolved Customer and to the resulting Invoice on finalisation. (Design-level aggregate introduced in planning to satisfy FR-013a/FR-014.)
 - **Workflow Step**: Step name, tool invoked, input payload, output/result, timestamp, exception flag, invoice reference (populated once the invoice is finalised; null while draft).
 - **Product Recommendation**: Recommended product, basis (co-purchase pattern), acceptance status.
 
