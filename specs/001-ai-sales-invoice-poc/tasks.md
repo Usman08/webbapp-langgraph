@@ -28,12 +28,12 @@ integration, and E2E tests (≥80% domain/application coverage; E2E for every P1
 
 - [ ] T001 Create repo solution layout (`backend/`, `ai-engine/`, `frontend/` dirs) and root `README.md` per plan.md Project Structure
 - [ ] T002 [P] Initialize .NET 8 solution with 4 projects (Api/Application/Domain/Infrastructure) + 2 test projects in `backend/` (`SalesInvoice.sln`)
-- [ ] T003 [P] Initialize Python 3.12 `ai-engine/` project with `pyproject.toml` (langgraph, langchain, fastapi, uvicorn, httpx, sse-starlette, anthropic, pytest)
+- [ ] T003 [P] Initialize Python 3.12 `ai-engine/` project with `pyproject.toml` (langgraph, langchain, langchain-groq, fastapi, uvicorn, httpx, sse-starlette, pytest)
 - [ ] T004 [P] Initialize React 18 + Vite + TypeScript app in `frontend/` with Tailwind, TanStack Query, React Router, Lucide (`frontend/package.json`, `vite.config.ts`)
 - [ ] T005 [P] Map design tokens from `design-system/ai-sales-invoice-poc/MASTER.md` into `frontend/tailwind.config.ts` (palette #0F172A/#334155/#0369A1/#F8FAFC/#020617, Plus Jakarta Sans)
 - [ ] T006 [P] Configure backend linting/formatting (`.editorconfig`, analyzers) and `Directory.Build.props` in `backend/`
 - [ ] T007 [P] Configure Python lint/format (ruff + black) and frontend ESLint/Prettier configs
-- [ ] T008 Create root `docker-compose.yml` (services: postgres, backend, ai-engine, frontend; ai-engine on internal network only) and `.env.example` (ANTHROPIC_API_KEY, ANTHROPIC_MODEL=claude-sonnet-4-6, ENGINE_TOKEN, POSTGRES_*)
+- [ ] T008 Create root `docker-compose.yml` (services: postgres, backend, ai-engine, frontend; ai-engine on internal network only) and `.env.example` (GROQ_API_KEY, GROQ_MODEL=openai/gpt-oss-120b, ENGINE_TOKEN, POSTGRES_*)
 
 **Checkpoint**: All three apps build/run empty; `docker compose up` starts Postgres.
 
@@ -101,7 +101,7 @@ integration, and E2E tests (≥80% domain/application coverage; E2E for every P1
 
 - [ ] T036 [US1] Implement tool wrappers calling .NET agent-tools (resolve-customer, history, adjust, inventory, discount, build-draft) in `ai-engine/app/tools/`
 - [ ] T037 [US1] Implement graph nodes (intent parse → customer lookup → history → quantity adjust → inventory → discount → build draft) and wire edges in `ai-engine/app/graph/nodes.py` + `build.py`
-- [ ] T038 [US1] Bind Claude `claude-sonnet-4-6` with tool-use for structured intent extraction (R7) in `ai-engine/app/graph/llm.py`
+- [ ] T038 [US1] Bind Groq `openai/gpt-oss-120b` (via `langchain-groq` ChatGroq) with tool-use for structured intent extraction (R7) in `ai-engine/app/graph/llm.py`
 - [ ] T039 [US1] Implement `POST /run` engine endpoint that executes the graph for a request in `ai-engine/app/main.py`
 - [ ] T040 [P] [US1] pytest for graph happy-path with mocked LLM + mocked .NET tools in `ai-engine/tests/test_workflow_us1.py`
 

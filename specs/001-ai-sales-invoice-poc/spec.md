@@ -158,6 +158,10 @@ Before the invoice is finalised, the operator must explicitly review and approve
 
 - Constraint: PostgreSQL MUST be used as the persistent data store for all entities (customers, products, invoices, workflow steps, etc.). Seed data is loaded into PostgreSQL at startup, not held in memory.
 
+### Session 2026-06-26 (constraint)
+
+- Constraint: The LangGraph workflow MUST use the **Groq API** as the LLM provider, with model **`openai/gpt-oss-120b`**. This replaces the earlier Claude `claude-sonnet-4-6` choice recorded in research.md (R5) and plan.md. The selected model MUST support reliable function/tool calling, since every agent action is a tool invocation. Model id MUST be configurable via environment variable.
+
 ---
 
 ## Assumptions
@@ -167,7 +171,7 @@ Before the invoice is finalised, the operator must explicitly review and approve
 - Tax rate is a single fixed percentage applied uniformly to all invoices (seeded value; no multi-jurisdiction tax logic needed).
 - "Usual discount" in the request maps to the customer's pre-configured discount tier; no dynamic negotiation logic is required.
 - Quantity rounding follows standard half-up rules (3.5 → 4, 3.4 → 3).
-- The AI workflow engine is LangGraph; the orchestration model is the project's chosen LLM (seeded with tool definitions matching the entities above).
+- The AI workflow engine is LangGraph; the orchestration LLM is **Groq-hosted `openai/gpt-oss-120b`** (via the Groq API), bound with tool definitions matching the entities above. The Groq API key is held server-side in the AI engine only (Principle II); the model id is environment-configurable.
 - Product recommendations are derived from co-purchase frequency in historical invoices, not from an external recommendation engine.
 - The UI is a single-page application; navigation between the request panel, workflow log, and invoice preview occurs within one screen.
 - Mobile viewport support is required per the project constitution (Principle I — Mobile First); all UI panels must be usable on a 375 px wide screen.

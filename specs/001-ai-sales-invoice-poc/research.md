@@ -84,16 +84,21 @@ A hosted `DbSeeder` runs at startup, **idempotent** (upsert by natural keys), sa
 
 ## R5. LLM provider & model
 
-**Decision**: **Claude `claude-sonnet-4-6`** via the Anthropic SDK inside the AI engine, with
-tool-use (function calling) bound to the agent-tool endpoints. Model id configurable via env.
+**Decision**: **Groq-hosted `openai/gpt-oss-120b`** via the **Groq API** (using `langchain-groq`'s
+`ChatGroq`) inside the AI engine, with tool-use (function calling) bound to the agent-tool
+endpoints. Model id and key configurable via env (`GROQ_MODEL`, `GROQ_API_KEY`).
+*(Supersedes the earlier Claude `claude-sonnet-4-6` choice — see spec Clarifications 2026-06-26.)*
 
 **Rationale**:
-- Latest, most capable general model for multi-step tool reasoning; strong tool-use reliability.
-- Per project guidance, default to the latest capable Claude model for AI applications.
+- User-mandated provider (Groq) for low-latency inference; `gpt-oss-120b` is a large model with
+  strong reasoning and native function-calling, suited to the multi-step tool workflow.
+- Reliable tool/function calling is essential — every agent action is a tool invocation (R7).
 - Key stays server-side in the AI engine (Principle II).
 
 **Alternatives considered**:
-- *Smaller/older model* — rejected: tool-calling reliability matters for a demo of reasoning.
+- *Claude `claude-sonnet-4-6`* — original choice; replaced by the user's Groq mandate.
+- *`llama-3.3-70b-versatile` on Groq* — viable; `gpt-oss-120b` chosen for stronger reasoning.
+- *`llama-3.1-8b-instant`* — rejected: weaker multi-step tool-calling reliability.
 - *Local model* — rejected: out of scope for a PoC; adds infra cost without demo value.
 
 ---

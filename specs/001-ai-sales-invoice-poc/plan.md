@@ -31,9 +31,9 @@ real-time workflow progress, execution history, and invoice preview with an appr
 
 **Primary Dependencies**:
 - Backend: ASP.NET Core 8 Web API, Entity Framework Core 8 (Npgsql provider), FluentValidation
-- AI Engine: LangGraph, LangChain, FastAPI, Uvicorn, httpx (calls back to .NET), SSE-Starlette
+- AI Engine: LangGraph, LangChain, langchain-groq, FastAPI, Uvicorn, httpx (calls back to .NET), SSE-Starlette
 - Frontend: React 18, Vite, TanStack Query, React Router, Tailwind CSS, Lucide icons
-- LLM: Claude (claude-sonnet-4-6 default) via Anthropic SDK in the AI engine
+- LLM: Groq API (`openai/gpt-oss-120b` default) via `langchain-groq` ChatGroq in the AI engine
 
 **Storage**: PostgreSQL 16 (all entities; EF Core migrations + idempotent seeder)
 
@@ -70,7 +70,7 @@ real-time workflow progress, execution history, and invoice preview with an appr
 | Principle | Status | Notes |
 |-----------|--------|-------|
 | I. Mobile First | ✅ PASS | Design system from `ui-ux-pro-max`; breakpoints 375/768/1280; mobile-viewport Playwright test required before UI tasks close. |
-| II. Security First | ✅ PASS (PoC exemption invoked) | EF Core parameterised queries; FluentValidation on all inputs; LLM/Anthropic keys server-side only (AI engine env vars), never in React bundle; SSE proxied through .NET (AI engine not publicly exposed). **End-user authentication is omitted under the Principle II PoC exemption (Constitution v1.1.0)**: (a) the feature is single-user and non-public; (b) the non-public service boundary `/internal/tools/*` is protected by the `X-Engine-Token` shared secret (task T023); (c) this exemption is recorded here. All other Security First requirements (input validation, secret handling, parameterised queries) remain in force. |
+| II. Security First | ✅ PASS (PoC exemption invoked) | EF Core parameterised queries; FluentValidation on all inputs; LLM/Groq keys server-side only (AI engine env vars), never in React bundle; SSE proxied through .NET (AI engine not publicly exposed). **End-user authentication is omitted under the Principle II PoC exemption (Constitution v1.1.0)**: (a) the feature is single-user and non-public; (b) the non-public service boundary `/internal/tools/*` is protected by the `X-Engine-Token` shared secret (task T023); (c) this exemption is recorded here. All other Security First requirements (input validation, secret handling, parameterised queries) remain in force. |
 | III. Intuitive UX | ✅ PASS | Single-screen SPA; actionable inline errors (FR-019); loading/streaming states for the >300 ms AI workflow; approval confirmation gate (FR-011). |
 | IV. Monolithic N-Layer | ⚠️ JUSTIFIED | Two runtime processes (.NET monolith + Python AI engine) instead of one. LangGraph has no .NET implementation, so the AI engine is a polyglot necessity. Mitigation: **all business/domain logic stays in the .NET N-layer monolith**; the Python service is a stateless reasoning orchestrator whose nodes call .NET agent-tool endpoints. See Complexity Tracking. |
 

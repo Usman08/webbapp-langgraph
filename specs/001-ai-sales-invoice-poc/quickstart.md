@@ -7,14 +7,14 @@ for details.
 ## Prerequisites
 
 - Docker + Docker Compose
-- An Anthropic API key
+- A Groq API key
 - Free ports: 5173 (frontend), 8080 (.NET API), 5432 (Postgres)
 
 ## Setup
 
 ```bash
 # from repo root
-cp .env.example .env            # set ANTHROPIC_API_KEY, ENGINE_TOKEN, POSTGRES_* , ANTHROPIC_MODEL=claude-sonnet-4-6
+cp .env.example .env            # set GROQ_API_KEY, ENGINE_TOKEN, POSTGRES_* , GROQ_MODEL=openai/gpt-oss-120b
 docker compose up --build       # starts postgres, backend, ai-engine, frontend
 ```
 
