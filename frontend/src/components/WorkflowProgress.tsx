@@ -19,6 +19,7 @@ const NODE_LABELS: Record<string, string> = {
   purchase_history: "Fetch Purchase History",
   quantity_adjustment: "Adjust Quantities",
   inventory_validation: "Validate Inventory",
+  recommend_products: "Recommend Products",
   discount_resolution: "Resolve Discount",
   build_draft: "Build Draft Invoice",
 };

@@ -30,9 +30,60 @@ Frontend: http://localhost:5173
 Backend API: http://localhost:8080  
 AI Engine (internal only): http://localhost:8000
 
+## Validation Scenarios (V1–V8)
+
+Full end-to-end validation steps are in [`specs/001-ai-sales-invoice-poc/quickstart.md`](specs/001-ai-sales-invoice-poc/quickstart.md), covering:
+
+| Scenario | What it tests |
+|---|---|
+| V1 | NL request → draft invoice within 30 s (SC-001) |
+| V2 | ≥6 labelled workflow steps streaming live (SC-002) |
+| V3 | Out-of-stock alternative / back-order handling (SC-003) |
+| V4 | AI product recommendation accept/decline |
+| V5 | Reject → edit → approve full journey under 2 min (SC-004) |
+| V6 | Invoice + workflow trail persists across reload (SC-008) |
+| V7 | Parse error shows actionable message (FR-019) |
+| V8 | 375 px mobile viewport — no horizontal scroll, 44 px targets |
+
+## Running Tests
+
+```bash
+# .NET unit tests (domain logic, pricing)
+cd backend && dotnet test tests/SalesInvoice.UnitTests
+
+# .NET integration tests (requires Docker — Testcontainers spins up Postgres 16)
+cd backend && dotnet test tests/SalesInvoice.IntegrationTests
+
+# Python AI engine tests (mocked LLM + tools)
+cd ai-engine && pytest
+
+# Playwright E2E (requires full stack running at localhost:5173)
+cd frontend && npx playwright test
+
+# k6 smoke performance test (requires backend running at localhost:5261)
+k6 run perf/smoke.js
+```
+
+## Environment Variables
+
+| Variable | Service | Description |
+|---|---|---|
+| `GROQ_API_KEY` | ai-engine | Groq API key |
+| `ENGINE_TOKEN` | backend + ai-engine | Shared secret for `/internal/tools/*` |
+| `POSTGRES_PASSWORD` | backend + postgres | Database password |
+| `AI_ENGINE_URL` | backend | Internal URL of the LangGraph service |
+
+## Key Design Decisions
+
+- **SSE streaming**: the AI engine emits named SSE events per workflow node; the .NET API relays them to the browser so no polling is needed.
+- **asyncio.Queue per run_id**: isolates concurrent workflow runs in the Python service; a SENTINEL signals end-of-stream.
+- **X-Engine-Token**: `/internal/tools/*` endpoints are only reachable from Docker's internal network — not from the browser.
+- **Testcontainers-Postgres**: integration tests use a real Postgres 16 container to prevent mock/prod divergence.
+- **MidpointRounding.AwayFromZero**: used throughout `InvoiceCalculator` so rounding error stays ≤ 0.01 (SC-006).
+
 ## Development
 
-See `specs/001-ai-sales-invoice-poc/plan.md` for architecture details and `specs/001-ai-sales-invoice-poc/quickstart.md` for validation scenarios.
+See [`specs/001-ai-sales-invoice-poc/plan.md`](specs/001-ai-sales-invoice-poc/plan.md) for full stack and architecture details.
 
 ### Backend
 

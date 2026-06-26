@@ -169,15 +169,15 @@ integration, and E2E tests (≥80% domain/application coverage; E2E for every P1
 
 **Independent Test**: Submit → Reject/Edit (lines editable, status Draft) → edit qty → Approve → Finalised in history with edits applied; finalisation impossible without explicit approval (SC-007).
 
-- [ ] T064 [US4] Implement `PUT /api/invoices/{invoiceId}/lines` (edit draft, recalc; 409 if Finalised, FR-012) in `backend/src/SalesInvoice.Api/Controllers/InvoicesController.cs`
-- [ ] T065 [US4] Implement `POST /api/invoices/{invoiceId}/approve` (Draft→Finalised, link WorkflowRun→Invoice, FR-011/013a; 409 if already Finalised) in `InvoicesController.cs`
-- [ ] T066 [US4] Implement `POST /api/invoices/{invoiceId}/reject` (unlock editing, status stays Draft, FR-012) in `InvoicesController.cs`
-- [ ] T067 [P] [US4] Implement `GET /api/invoices` (history, `?status=` filter) and `GET /api/invoices/{invoiceId}/workflow` (reasoning trail, FR-013a) in `InvoicesController.cs`
-- [ ] T068 [P] [US4] Build approval gate UI (Approve / Reject-Edit, editable lines incl. BackOrder retain/remove FR-020, confirmation) in `frontend/src/components/ApprovalGate.tsx`
-- [ ] T069 [P] [US4] Build `InvoiceHistory` view with drill-in to finalised invoice + its workflow trail in `frontend/src/components/InvoiceHistory.tsx`
-- [ ] T070 [US4] Wire approve/reject/edit flows and history navigation in `frontend/src/pages/Workspace.tsx`
-- [ ] T071 [P] [US4] Integration tests: approval finalises + reflects edits; no-approval never finalises (SC-007); reject keeps Draft in `backend/tests/SalesInvoice.IntegrationTests/ApprovalTests.cs`
-- [ ] T072 [US4] Playwright E2E for V5 (reject→edit→approve→history) and V6 (persistence across reload), asserting the full submit→approve journey completes in under 2 minutes (SC-004), in `frontend/tests/e2e/us4-approval.spec.ts`
+- [X] T064 [US4] Implement `PUT /api/invoices/{invoiceId}/lines` (edit draft, recalc; 409 if Finalised, FR-012) in `backend/src/SalesInvoice.Api/Controllers/InvoicesController.cs`
+- [X] T065 [US4] Implement `POST /api/invoices/{invoiceId}/approve` (Draft→Finalised, link WorkflowRun→Invoice, FR-011/013a; 409 if already Finalised) in `InvoicesController.cs`
+- [X] T066 [US4] Implement `POST /api/invoices/{invoiceId}/reject` (unlock editing, status stays Draft, FR-012) in `InvoicesController.cs`
+- [X] T067 [P] [US4] Implement `GET /api/invoices` (history, `?status=` filter) and `GET /api/invoices/{invoiceId}/workflow` (reasoning trail, FR-013a) in `InvoicesController.cs`
+- [X] T068 [P] [US4] Build approval gate UI (Approve / Reject-Edit, editable lines incl. BackOrder retain/remove FR-020, confirmation) in `frontend/src/components/ApprovalGate.tsx`
+- [X] T069 [P] [US4] Build `InvoiceHistory` view with drill-in to finalised invoice + its workflow trail in `frontend/src/components/InvoiceHistory.tsx`
+- [X] T070 [US4] Wire approve/reject/edit flows and history navigation in `frontend/src/pages/Workspace.tsx`
+- [X] T071 [P] [US4] Integration tests: approval finalises + reflects edits; no-approval never finalises (SC-007); reject keeps Draft in `backend/tests/SalesInvoice.IntegrationTests/ApprovalTests.cs`
+- [X] T072 [US4] Playwright E2E for V5 (reject→edit→approve→history) and V6 (persistence across reload), asserting the full submit→approve journey completes in under 2 minutes (SC-004), in `frontend/tests/e2e/us4-approval.spec.ts`
 
 **Checkpoint**: All user stories independently functional and integrated.
 
@@ -187,15 +187,15 @@ integration, and E2E tests (≥80% domain/application coverage; E2E for every P1
 
 **Purpose**: Edge cases, quality gates, and constitution compliance across all stories.
 
-- [ ] T073 [P] Implement `parse_error` handling end-to-end (FR-019): engine emits event, UI shows inline actionable error keeping input editable; test in `frontend/tests/e2e/parse-error.spec.ts`
-- [ ] T074 [P] Edge-case tests: first-time customer (no prior invoice), fractional rounding, missing discount rule, cascade out-of-stock BackOrder (FR-020) in `backend/tests/SalesInvoice.IntegrationTests/EdgeCaseTests.cs`
-- [ ] T075 [P] Mobile-first verification: Playwright 375px viewport project (no horizontal scroll, ≥44px touch targets — Constitution I) in `frontend/tests/e2e/mobile.spec.ts`
-- [ ] T076 [P] Accessibility pass: focus states, aria-labels on icon buttons, color-contrast ≥4.5:1, form labels (per ui-ux-pro-max checklist) across `frontend/src/components/`
-- [ ] T077 [P] Security review: confirm input sanitisation/validation on all endpoints, no secrets in client bundle, ai-engine not browser-reachable, parameterised queries (Constitution II)
-- [ ] T078 Verify domain/application unit coverage ≥80% (Constitution Quality gate); add tests where short in `backend/tests/SalesInvoice.UnitTests/`
-- [ ] T079 [P] Run `quickstart.md` V1–V8 validation scenarios end-to-end via `docker compose up` and record results
-- [ ] T080 [P] Add `README.md` run instructions + architecture diagram reference (plan.md) at repo root
-- [ ] T081 [P] Smoke perf check: assert P95 < 500 ms for non-AI endpoints (`GET /api/products`, `GET /api/invoices`) under light concurrent load (Constitution Quality gate); record results via a k6/bombardier script at repo root (`perf/smoke.js`)
+- [X] T073 [P] Implement `parse_error` handling end-to-end (FR-019): engine emits event, UI shows inline actionable error keeping input editable; test in `frontend/tests/e2e/parse-error.spec.ts`
+- [X] T074 [P] Edge-case tests: first-time customer (no prior invoice), fractional rounding, missing discount rule, cascade out-of-stock BackOrder (FR-020) in `backend/tests/SalesInvoice.IntegrationTests/EdgeCaseTests.cs`
+- [X] T075 [P] Mobile-first verification: Playwright 375px viewport project (no horizontal scroll, ≥44px touch targets — Constitution I) in `frontend/tests/e2e/mobile.spec.ts`
+- [X] T076 [P] Accessibility pass: focus states, aria-labels on icon buttons, color-contrast ≥4.5:1, form labels (per ui-ux-pro-max checklist) across `frontend/src/components/`
+- [X] T077 [P] Security review: confirm input sanitisation/validation on all endpoints, no secrets in client bundle, ai-engine not browser-reachable, parameterised queries (Constitution II)
+- [X] T078 Verify domain/application unit coverage ≥80% (Constitution Quality gate); add tests where short in `backend/tests/SalesInvoice.UnitTests/`
+- [X] T079 [P] Run `quickstart.md` V1–V8 validation scenarios end-to-end via `docker compose up` and record results
+- [X] T080 [P] Add `README.md` run instructions + architecture diagram reference (plan.md) at repo root
+- [X] T081 [P] Smoke perf check: assert P95 < 500 ms for non-AI endpoints (`GET /api/products`, `GET /api/invoices`) under light concurrent load (Constitution Quality gate); record results via a k6/bombardier script at repo root (`perf/smoke.js`)
 
 ---
 

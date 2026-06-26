@@ -6,6 +6,8 @@ import { DisambiguationDialog } from "../components/DisambiguationDialog";
 import { WorkflowProgress, type WorkflowStep } from "../components/WorkflowProgress";
 import { ExecutionLog } from "../components/ExecutionLog";
 import { RecommendationPanel, type Recommendation } from "../components/RecommendationPanel";
+import { ApprovalGate, type EditableLine } from "../components/ApprovalGate";
+import { InvoiceHistory } from "../components/InvoiceHistory";
 import { apiClient } from "../services/apiClient";
 import { connectWorkflowStream, type WorkflowEvent } from "../services/sseClient";
 
@@ -31,6 +33,7 @@ const NODE_ORDER = [
   "purchase_history",
   "quantity_adjustment",
   "inventory_validation",
+  "recommend_products",
   "discount_resolution",
   "build_draft",
 ];
@@ -45,6 +48,7 @@ export function Workspace() {
   const [streamDone, setStreamDone] = useState(false);
   const [disambigCandidates, setDisambigCandidates] = useState<{ id: string; name: string }[]>([]);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [invoiceStatus, setInvoiceStatus] = useState<string>("Draft");
   const closeStreamRef = useRef<(() => void) | null>(null);
 
   const { data: runState } = useQuery<RunState>({
@@ -55,11 +59,15 @@ export function Workspace() {
   });
 
   type Invoice = Parameters<typeof InvoicePreview>[0]["invoice"];
-  const { data: invoice } = useQuery<Invoice>({
+  const { data: invoice, refetch: refetchInvoice } = useQuery<Invoice>({
     queryKey: ["invoice", runState?.draftInvoiceId],
     queryFn: () => apiClient.get<Invoice>(`/api/invoices/${runState!.draftInvoiceId}`),
     enabled: !!runState?.draftInvoiceId,
   });
+
+  // Keep invoiceStatus in sync with fetched invoice
+  const invoiceId = runState?.draftInvoiceId ?? null;
+  const currentInvoiceStatus = invoice?.status ?? invoiceStatus;
 
   const updateStep = useCallback((name: string, patch: Partial<WorkflowStep>) => {
     setSteps((prev) => {
@@ -136,9 +144,34 @@ export function Workspace() {
       prev.map((r) => r.recommendationId === recId ? { ...r, status: accepted ? "accepted" : "declined" } : r)
     );
     if (accepted && result.updatedInvoice) {
-      await queryClient.invalidateQueries({ queryKey: ["invoice"] });
+      await refetchInvoice();
     }
-  }, [runId]);
+  }, [runId, refetchInvoice]);
+
+  const handleApprove = useCallback(async () => {
+    if (!invoiceId) return;
+    await apiClient.post(`/api/invoices/${invoiceId}/approve`, {});
+    setInvoiceStatus("Finalised");
+    await refetchInvoice();
+    await queryClient.invalidateQueries({ queryKey: ["invoices"] });
+  }, [invoiceId, refetchInvoice, queryClient]);
+
+  const handleReject = useCallback(async () => {
+    if (!invoiceId) return;
+    await apiClient.post(`/api/invoices/${invoiceId}/reject`, {});
+    // Status stays Draft — editing mode is entered by ApprovalGate
+  }, [invoiceId]);
+
+  const handleSaveEdits = useCallback(async (editedLines: EditableLine[]) => {
+    if (!invoiceId) return;
+    const payload = editedLines.map((l) => ({
+      productId: l.productId,
+      quantity: l.quantity,
+      stockStatus: l.stockStatus,
+    }));
+    await apiClient.put(`/api/invoices/${invoiceId}/lines`, payload);
+    await refetchInvoice();
+  }, [invoiceId, refetchInvoice]);
 
   const handleSubmit = useCallback(async (text: string) => {
     setSubmitError(null);
@@ -149,6 +182,7 @@ export function Workspace() {
     setStreamDone(false);
     setDisambigCandidates([]);
     setRecommendations([]);
+    setInvoiceStatus("Draft");
     closeStreamRef.current?.();
 
     try {
@@ -177,6 +211,17 @@ export function Workspace() {
   const parseError = sseEvents.find((e) => e.type === "parse_error");
   const isRunning = !!runId && !streamDone;
   const isFailed = sseEvents.some((e) => e.type === "workflow_failed") && streamDone;
+
+  const approvalLines: EditableLine[] = invoice?.lineItems?.map((l) => ({
+    id: l.id,
+    productId: l.productId,
+    sku: l.sku,
+    name: l.name,
+    quantity: l.quantity,
+    unitPrice: l.unitPrice,
+    lineTotal: l.lineTotal,
+    stockStatus: l.stockStatus,
+  })) ?? [];
 
   return (
     <div className="min-h-screen bg-background p-4 xs:p-6">
@@ -218,6 +263,24 @@ export function Workspace() {
 
         {invoice && <InvoicePreview invoice={invoice} />}
 
+        {invoice && currentInvoiceStatus === "Draft" && streamDone && (
+          <ApprovalGate
+            invoiceId={invoice.id}
+            invoiceStatus={currentInvoiceStatus}
+            lines={approvalLines}
+            onApprove={handleApprove}
+            onReject={handleReject}
+            onSaveEdits={handleSaveEdits}
+          />
+        )}
+
+        {invoice && currentInvoiceStatus === "Finalised" && (
+          <div role="status" className="text-success text-sm bg-success/10 rounded-lg p-3 flex items-center gap-2">
+            <span className="font-medium">Invoice finalised.</span>
+            <span className="text-foreground-muted">Total: {invoice.total.toLocaleString("en-US", { style: "currency", currency: "USD" })}</span>
+          </div>
+        )}
+
         {isFailed && (
           <div role="alert" className="text-error text-sm bg-error/10 rounded-lg p-3">
             The workflow failed. Please try again or rephrase your request.
@@ -225,6 +288,8 @@ export function Workspace() {
         )}
 
         <ExecutionLog events={sseEvents} />
+
+        <InvoiceHistory />
       </main>
     </div>
   );

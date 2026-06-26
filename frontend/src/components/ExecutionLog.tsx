@@ -46,6 +46,7 @@ function LogEntry({ event }: { event: WorkflowEvent }) {
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-start gap-2 p-2 text-left min-h-[44px]"
         aria-expanded={open}
+        aria-label={`${open ? "Collapse" : "Expand"} ${EVENT_LABELS[event.type] ?? event.type} event`}
       >
         {open ? (
           <ChevronDown className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-foreground-muted" aria-hidden />
