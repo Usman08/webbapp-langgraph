@@ -2,5 +2,4 @@ node_modules/
 dist/
 tests/
 *.md
-nginx.conf
 playwright.config.ts
