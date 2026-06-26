@@ -40,7 +40,14 @@ public class InvoiceRequestsController(
 
         // Register the run with the AI engine before returning the streamUrl,
         // so the client cannot connect to /stream before _pending_runs is populated.
-        await TriggerAiEngineAsync(run.Id, sanitised);
+        try
+        {
+            await TriggerAiEngineAsync(run.Id, sanitised);
+        }
+        catch
+        {
+            return StatusCode(502, new { title = "AI engine unavailable. Please try again shortly.", status = 502 });
+        }
 
         return StatusCode(201, new
         {
@@ -222,9 +229,11 @@ public class InvoiceRequestsController(
         try
         {
             var client = httpClientFactory.CreateClient("AiEngine");
-            await client.PostAsJsonAsync("/run", new { runId, requestText });
+            // Python RunRequest model uses snake_case: run_id, request_text
+            var response = await client.PostAsJsonAsync("/run", new { run_id = runId.ToString(), request_text = requestText });
+            response.EnsureSuccessStatusCode();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             using var scope = scopeFactory.CreateScope();
             var scopedDb = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -235,6 +244,7 @@ public class InvoiceRequestsController(
                 run.CompletedAt = DateTimeOffset.UtcNow;
                 await scopedDb.SaveChangesAsync();
             }
+            throw new InvalidOperationException($"AI engine unreachable: {ex.Message}", ex);
         }
     }
 }
