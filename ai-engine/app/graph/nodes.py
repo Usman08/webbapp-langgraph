@@ -119,15 +119,37 @@ async def get_history(state: WorkflowState) -> WorkflowState:
     await _record(state, 3, "purchase_history", "get-purchase-history",
                   {"customerId": customer_id}, result)
 
-    items_to_use = state.get("requested_items", [])
-
     use_prev = state.get("use_previous_order", False)
+
     if use_prev and result.get("mostRecentInvoice"):
         prev_lines = result["mostRecentInvoice"].get("lines", [])
         items_to_use = [{"productId": l["productId"], "quantity": l["quantity"]} for l in prev_lines]
         await _emit(state, ev.decision(3, f"Using {len(items_to_use)} lines from previous order"))
+        return {**state, "purchase_history": result, "requested_items": items_to_use}
 
-    return {**state, "purchase_history": result, "requested_items": items_to_use}
+    # Resolve product hints from the LLM's parsed intent into real productIds.
+    # The LLM returns state["items"] = [{"product_hint": "...", "quantity": N}].
+    llm_items = state.get("items", [])
+    resolved: list[dict] = []
+    for item in llm_items:
+        hint = item.get("product_hint", "")
+        qty = int(item.get("quantity", 1) or 1)
+        if not hint:
+            continue
+        search_result = await dotnet_tools.search_products(hint, max_results=1)
+        products = search_result.get("products", [])
+        if products:
+            resolved.append({"productId": products[0]["productId"], "quantity": qty})
+
+    # Fall back to most recent order if LLM gave no resolvable hints
+    if not resolved and result.get("mostRecentInvoice"):
+        prev_lines = result["mostRecentInvoice"].get("lines", [])
+        resolved = [{"productId": l["productId"], "quantity": l["quantity"]} for l in prev_lines]
+        await _emit(state, ev.decision(3, f"No specific items found — using {len(resolved)} lines from previous order"))
+    else:
+        await _emit(state, ev.decision(3, f"Resolved {len(resolved)} product(s) from request"))
+
+    return {**state, "purchase_history": result, "requested_items": resolved}
 
 
 # ── Node 4: Adjust quantities ──────────────────────────────────────────────────

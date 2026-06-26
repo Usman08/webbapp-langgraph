@@ -73,6 +73,12 @@ async def recommend_products(customer_id: str, draft_product_ids: list[str]) -> 
     )
 
 
+async def search_products(hint: str, max_results: int = 5) -> dict:
+    return await dotnet_client.post_tool(
+        "search-products", {"hint": hint, "maxResults": max_results}
+    )
+
+
 async def save_recommendation(workflow_run_id: str, product_id: str, sku: str, basis: str) -> dict:
     return await dotnet_client.post_tool(
         "save-recommendation",

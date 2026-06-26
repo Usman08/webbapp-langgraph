@@ -14,7 +14,8 @@ public class ToolsController(
     BuildDraftHandler buildDraft,
     RecordStepHandler recordStep,
     RecommendProductsHandler recommendProducts,
-    SaveRecommendationHandler saveRecommendation) : ControllerBase
+    SaveRecommendationHandler saveRecommendation,
+    SearchProductsHandler searchProducts) : ControllerBase
 {
     [HttpPost("resolve-customer")]
     public async Task<IActionResult> ResolveCustomer([FromBody] ResolveCustomerRequest request)
@@ -51,4 +52,8 @@ public class ToolsController(
     [HttpPost("save-recommendation")]
     public async Task<IActionResult> SaveRecommendation([FromBody] SaveRecommendationRequest request)
         => Ok(await saveRecommendation.HandleAsync(request));
+
+    [HttpPost("search-products")]
+    public async Task<IActionResult> SearchProducts([FromBody] SearchProductsRequest request)
+        => Ok(await searchProducts.HandleAsync(request));
 }
