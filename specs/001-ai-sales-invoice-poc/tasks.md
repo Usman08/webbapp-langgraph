@@ -132,15 +132,15 @@ integration, and E2E tests (≥80% domain/application coverage; E2E for every P1
 
 **Independent Test**: Submit any valid request; confirm ≥6 labelled steps (SC-002) stream live with inputs/outputs, and the log survives reload.
 
-- [ ] T049 [P] [US2] Implement `POST /internal/tools/record-step` (persist WorkflowStep, FR-014) in `backend/src/SalesInvoice.Application/Tools/RecordStepHandler.cs`
-- [ ] T050 [US2] Emit SSE events per node/tool (run_started, node_started, tool_invoked, tool_result, decision, exception, draft_ready, workflow_complete — contracts/workflow-events.md) in `ai-engine/app/streaming/events.py` + integrate into graph nodes
-- [ ] T051 [US2] Engine: call `record-step` for each step as it streams (1:1 with SSE events) in `ai-engine/app/graph/nodes.py`
-- [ ] T052 [US2] Implement `GET /api/invoices/requests/{runId}/stream` SSE relay (proxy ai-engine stream, keep engine private) in `backend/src/SalesInvoice.Api/Controllers/InvoiceRequestsController.cs`
-- [ ] T053 [P] [US2] Build `WorkflowProgress` component (ordered step nodes, live status) in `frontend/src/components/WorkflowProgress.tsx`
-- [ ] T054 [P] [US2] Build `ExecutionLog` component (tool name, input, output, exception highlighting) in `frontend/src/components/ExecutionLog.tsx`
-- [ ] T055 [US2] Subscribe to SSE on submit; render steps live; respect `prefers-reduced-motion` in `frontend/src/pages/Workspace.tsx`
-- [ ] T056 [P] [US2] Integration test: SSE event ordering + every tool_invoked has one tool_result/exception (contract) in `backend/tests/SalesInvoice.IntegrationTests/StreamTests.cs`
-- [ ] T057 [P] [US2] pytest: step persistence + event/step 1:1 mapping in `ai-engine/tests/test_streaming.py`
+- [X] T049 [P] [US2] Implement `POST /internal/tools/record-step` (persist WorkflowStep, FR-014) in `backend/src/SalesInvoice.Application/Tools/RecordStepHandler.cs`
+- [X] T050 [US2] Emit SSE events per node/tool (run_started, node_started, tool_invoked, tool_result, decision, exception, draft_ready, workflow_complete — contracts/workflow-events.md) in `ai-engine/app/streaming/events.py` + integrate into graph nodes
+- [X] T051 [US2] Engine: call `record-step` for each step as it streams (1:1 with SSE events) in `ai-engine/app/graph/nodes.py`
+- [X] T052 [US2] Implement `GET /api/invoices/requests/{runId}/stream` SSE relay (proxy ai-engine stream, keep engine private) in `backend/src/SalesInvoice.Api/Controllers/InvoiceRequestsController.cs`
+- [X] T053 [P] [US2] Build `WorkflowProgress` component (ordered step nodes, live status) in `frontend/src/components/WorkflowProgress.tsx`
+- [X] T054 [P] [US2] Build `ExecutionLog` component (tool name, input, output, exception highlighting) in `frontend/src/components/ExecutionLog.tsx`
+- [X] T055 [US2] Subscribe to SSE on submit; render steps live; respect `prefers-reduced-motion` in `frontend/src/pages/Workspace.tsx`
+- [X] T056 [P] [US2] Integration test: SSE event ordering + every tool_invoked has one tool_result/exception (contract) in `backend/tests/SalesInvoice.IntegrationTests/StreamTests.cs`
+- [X] T057 [P] [US2] pytest: step persistence + event/step 1:1 mapping in `ai-engine/tests/test_streaming.py`
 
 **Checkpoint**: US1 + US2 work together; reasoning is fully transparent and reload-safe.
 
