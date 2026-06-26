@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 COPY ["src/SalesInvoice.Api/SalesInvoice.Api.csproj", "src/SalesInvoice.Api/"]
@@ -11,7 +11,7 @@ COPY . .
 RUN dotnet publish "src/SalesInvoice.Api/SalesInvoice.Api.csproj" \
     -c Release -o /app/publish --no-restore
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
