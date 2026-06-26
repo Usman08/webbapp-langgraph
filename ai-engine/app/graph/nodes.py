@@ -243,3 +243,34 @@ async def build_draft(state: WorkflowState) -> WorkflowState:
     await _emit(state, ev.workflow_complete(run_id))
 
     return {**state, "draft_invoice": result}
+
+
+# ── Node 8: Recommend products ─────────────────────────────────────────────────
+
+async def recommend_products(state: WorkflowState) -> WorkflowState:
+    customer_id = state.get("customer_id", "")
+    inv_lines = state.get("inventory_result", [])
+    draft_product_ids = [l["productId"] for l in inv_lines]
+
+    await _emit(state, ev.node_started(8, "recommend_products"))
+    await _emit(state, ev.tool_invoked(8, "recommend-products",
+                                       {"customerId": customer_id, "draftProductIds": draft_product_ids}))
+
+    result = await dotnet_tools.recommend_products(customer_id, draft_product_ids)
+    await _record(state, 8, "recommend_products", "recommend-products",
+                  {"customerId": customer_id, "draftProductIds": draft_product_ids}, result)
+
+    recs = result.get("recommendations", [])
+    run_id = state.get("run_id", "")
+    for r in recs:
+        # Persist to DB and get a stable recommendation ID for the SSE event
+        saved = await dotnet_tools.save_recommendation(
+            run_id, str(r.get("productId", "")), r.get("sku", ""), r.get("basis", "")
+        )
+        rec_id = saved.get("recommendationId", str(r.get("productId", "")))
+        await _emit(state, ev.recommendation(rec_id, r.get("sku", ""), r.get("basis", "")))
+
+    if recs:
+        await _emit(state, ev.decision(8, f"{len(recs)} product(s) recommended based on co-purchase history"))
+
+    return {**state, "recommendations": recs}

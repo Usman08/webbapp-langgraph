@@ -152,12 +152,12 @@ integration, and E2E tests (≥80% domain/application coverage; E2E for every P1
 
 **Independent Test**: Use a customer with a known co-purchase pattern; confirm ≥1 justified recommendation; accepting adds a correctly priced line (FR-009).
 
-- [ ] T058 [P] [US3] Implement `POST /internal/tools/recommend-products` (co-purchase ranking from history) in `backend/src/SalesInvoice.Application/Tools/RecommendProductsHandler.cs`
-- [ ] T059 [US3] Add recommendation node + `recommendation` SSE event to the graph in `ai-engine/app/graph/nodes.py`
-- [ ] T060 [US3] Implement `POST /api/invoices/requests/{runId}/recommendations/{id}` (accept/decline → recalc draft) in `backend/src/SalesInvoice.Api/Controllers/InvoiceRequestsController.cs`
-- [ ] T061 [P] [US3] Build `RecommendationPanel` component (product, basis text, accept/decline) in `frontend/src/components/RecommendationPanel.tsx`
-- [ ] T062 [US3] Wire accept/decline → recalc → update preview in `frontend/src/pages/Workspace.tsx`
-- [ ] T063 [P] [US3] Integration test: recommendation generation + accept recalculation in `backend/tests/SalesInvoice.IntegrationTests/RecommendationTests.cs`
+- [X] T058 [P] [US3] Implement `POST /internal/tools/recommend-products` (co-purchase ranking from history) in `backend/src/SalesInvoice.Application/Tools/RecommendProductsHandler.cs`
+- [X] T059 [US3] Add recommendation node + `recommendation` SSE event to the graph in `ai-engine/app/graph/nodes.py`
+- [X] T060 [US3] Implement `POST /api/invoices/requests/{runId}/recommendations/{id}` (accept/decline → recalc draft) in `backend/src/SalesInvoice.Api/Controllers/InvoiceRequestsController.cs`
+- [X] T061 [P] [US3] Build `RecommendationPanel` component (product, basis text, accept/decline) in `frontend/src/components/RecommendationPanel.tsx`
+- [X] T062 [US3] Wire accept/decline → recalc → update preview in `frontend/src/pages/Workspace.tsx`
+- [X] T063 [P] [US3] Integration test: recommendation generation + accept recalculation in `backend/tests/SalesInvoice.IntegrationTests/RecommendationTests.cs`
 
 **Checkpoint**: US1–US3 independently functional.
 

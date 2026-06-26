@@ -55,6 +55,7 @@ public class InvoiceRequestsController(
         var run = await db.WorkflowRuns
             .Include(r => r.Customer)
             .Include(r => r.Steps.OrderBy(s => s.Sequence))
+            .Include(r => r.Recommendations)
             .FirstOrDefaultAsync(r => r.Id == runId);
 
         if (run is null) return NotFound();
@@ -64,12 +65,82 @@ public class InvoiceRequestsController(
             : new CustomerDto(run.Customer.Id, run.Customer.Name, run.Customer.Type.ToString(),
                 run.Customer.DiscountTier, run.Customer.ContactEmail);
 
+        var recs = run.Recommendations
+            .Select(r => new ProductRecommendationDto2(r.Id, r.ProductId, r.Basis, r.Accepted))
+            .ToList();
+
         var dto = new WorkflowRunDto(
             run.Id, run.Status.ToString(), customerDto, run.InvoiceId,
             run.Steps.Select(s => new WorkflowStepDto(s.Id, s.Sequence, s.Name, s.ToolInvoked,
-                s.InputPayload, s.OutputResult, s.IsException, s.Timestamp)).ToList());
+                s.InputPayload, s.OutputResult, s.IsException, s.Timestamp)).ToList(),
+            recs);
 
         return Ok(dto);
+    }
+
+    [HttpPost("{runId:guid}/recommendations/{recommendationId:guid}")]
+    public async Task<IActionResult> ActOnRecommendation(Guid runId, Guid recommendationId, [FromBody] RecommendationActionBody body)
+    {
+        var rec = await db.ProductRecommendations
+            .FirstOrDefaultAsync(r => r.Id == recommendationId && r.WorkflowRunId == runId);
+
+        if (rec is null) return NotFound();
+
+        rec.Accepted = body.Accepted;
+        await db.SaveChangesAsync();
+
+        if (!body.Accepted)
+            return Ok(new { recommendationId, accepted = false });
+
+        // Accept: add the recommended product to the draft invoice and recalculate
+        var run = await db.WorkflowRuns.FindAsync(runId);
+        if (run?.InvoiceId is null)
+            return Ok(new { recommendationId, accepted = true });
+
+        var invoice = await db.Invoices
+            .Include(i => i.LineItems)
+            .ThenInclude(l => l.Product)
+            .FirstOrDefaultAsync(i => i.Id == run.InvoiceId);
+
+        if (invoice is null || invoice.Status == Domain.Enums.InvoiceStatus.Finalised)
+            return Ok(new { recommendationId, accepted = true });
+
+        var product = await db.Products.FindAsync(rec.ProductId);
+        if (product is null)
+            return Ok(new { recommendationId, accepted = true });
+
+        // Add one unit of the recommended product
+        var newLine = new Domain.Entities.InvoiceLineItem
+        {
+            Id = Guid.NewGuid(),
+            InvoiceId = invoice.Id,
+            ProductId = product.Id,
+            Quantity = 1,
+            UnitPrice = product.UnitPrice,
+            LineTotal = product.UnitPrice,
+            StockStatus = Domain.Enums.LineStockStatus.InStock,
+        };
+        db.InvoiceLineItems.Add(newLine);
+
+        // Recalculate totals
+        var allLines = invoice.LineItems.Append(newLine).ToList();
+        var lineInputs = allLines.Select(l => new Domain.Pricing.LineInput(l.Quantity, l.UnitPrice, l.StockStatus)).ToList();
+        var totals = Domain.Pricing.InvoiceCalculator.Calculate(lineInputs, invoice.DiscountPercentage, invoice.TaxPercentage, includeBackOrder: true);
+
+        invoice.Subtotal = totals.Subtotal;
+        invoice.DiscountAmount = totals.DiscountAmount;
+        invoice.TaxAmount = totals.TaxAmount;
+        invoice.Total = totals.Total;
+
+        await db.SaveChangesAsync();
+
+        // Return updated invoice
+        var updated = await db.Invoices
+            .Include(i => i.Customer)
+            .Include(i => i.LineItems).ThenInclude(l => l.Product)
+            .FirstOrDefaultAsync(i => i.Id == invoice.Id);
+
+        return Ok(new { recommendationId, accepted = true, updatedInvoice = MapInvoiceSummary(updated!) });
     }
 
     [HttpGet("{runId:guid}/stream")]
@@ -126,6 +197,25 @@ public class InvoiceRequestsController(
         return Ok(new { runId, customerId = body.CustomerId });
     }
 
+    private static object MapInvoiceSummary(Domain.Entities.Invoice i) => new
+    {
+        id = i.Id,
+        status = i.Status.ToString(),
+        subtotal = i.Subtotal,
+        discountAmount = i.DiscountAmount,
+        taxAmount = i.TaxAmount,
+        total = i.Total,
+        lineItems = i.LineItems.Select(l => new
+        {
+            productId = l.ProductId,
+            sku = l.Product?.Sku,
+            quantity = l.Quantity,
+            unitPrice = l.UnitPrice,
+            lineTotal = l.LineTotal,
+            stockStatus = l.StockStatus.ToString(),
+        }),
+    };
+
     private async Task TriggerAiEngineAsync(Guid runId, string requestText)
     {
         try
@@ -150,3 +240,4 @@ public class InvoiceRequestsController(
 
 public record SubmitRequestBody(string RequestText);
 public record DisambiguateBody(Guid CustomerId);
+public record RecommendationActionBody(bool Accepted);

@@ -76,5 +76,9 @@ def workflow_failed(run_id: str, reason: str) -> SSEEvent:
     return SSEEvent("workflow_failed", {"runId": run_id, "reason": reason})
 
 
+def recommendation(recommendation_id: str, sku: str, basis: str) -> SSEEvent:
+    return SSEEvent("recommendation", {"recommendationId": recommendation_id, "sku": sku, "basis": basis})
+
+
 def parse_error(message: str, suggestion: str = "") -> SSEEvent:
     return SSEEvent("parse_error", {"message": message, "suggestion": suggestion})

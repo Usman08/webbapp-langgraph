@@ -31,6 +31,7 @@ builder.Services.AddScoped<ResolveDiscountHandler>();
 builder.Services.AddScoped<BuildDraftHandler>();
 builder.Services.AddScoped<RecordStepHandler>();
 builder.Services.AddScoped<RecommendProductsHandler>();
+builder.Services.AddScoped<SaveRecommendationHandler>();
 
 builder.Services.AddHttpClient("AiEngine", client =>
 {

@@ -1,10 +1,11 @@
 import { useState, useCallback, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { RequestBox } from "../components/RequestBox";
 import { InvoicePreview } from "../components/InvoicePreview";
 import { DisambiguationDialog } from "../components/DisambiguationDialog";
 import { WorkflowProgress, type WorkflowStep } from "../components/WorkflowProgress";
 import { ExecutionLog } from "../components/ExecutionLog";
+import { RecommendationPanel, type Recommendation } from "../components/RecommendationPanel";
 import { apiClient } from "../services/apiClient";
 import { connectWorkflowStream, type WorkflowEvent } from "../services/sseClient";
 
@@ -35,6 +36,7 @@ const NODE_ORDER = [
 ];
 
 export function Workspace() {
+  const queryClient = useQueryClient();
   const [runId, setRunId] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -42,6 +44,7 @@ export function Workspace() {
   const [steps, setSteps] = useState<WorkflowStep[]>([]);
   const [streamDone, setStreamDone] = useState(false);
   const [disambigCandidates, setDisambigCandidates] = useState<{ id: string; name: string }[]>([]);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const closeStreamRef = useRef<(() => void) | null>(null);
 
   const { data: runState } = useQuery<RunState>({
@@ -93,6 +96,17 @@ export function Workspace() {
         case "needs_input":
           setDisambigCandidates(event.data.candidates as { id: string; name: string }[]);
           break;
+        case "recommendation":
+          setRecommendations((prev) => [
+            ...prev,
+            {
+              recommendationId: event.data.recommendationId as string,
+              sku: event.data.sku as string,
+              basis: event.data.basis as string,
+              status: "pending",
+            },
+          ]);
+          break;
         case "draft_ready":
         case "workflow_complete":
           setStreamDone(true);
@@ -112,6 +126,20 @@ export function Workspace() {
     [updateStep]
   );
 
+  const handleRecommendationAction = useCallback(async (recId: string, accepted: boolean) => {
+    if (!runId) return;
+    const result = await apiClient.post<{ updatedInvoice?: unknown }>(
+      `/api/invoices/requests/${runId}/recommendations/${recId}`,
+      { accepted }
+    );
+    setRecommendations((prev) =>
+      prev.map((r) => r.recommendationId === recId ? { ...r, status: accepted ? "accepted" : "declined" } : r)
+    );
+    if (accepted && result.updatedInvoice) {
+      await queryClient.invalidateQueries({ queryKey: ["invoice"] });
+    }
+  }, [runId]);
+
   const handleSubmit = useCallback(async (text: string) => {
     setSubmitError(null);
     setSubmitting(true);
@@ -120,6 +148,7 @@ export function Workspace() {
     setSteps([]);
     setStreamDone(false);
     setDisambigCandidates([]);
+    setRecommendations([]);
     closeStreamRef.current?.();
 
     try {
@@ -180,6 +209,12 @@ export function Workspace() {
         )}
 
         <WorkflowProgress steps={steps} isRunning={isRunning} />
+
+        <RecommendationPanel
+          recommendations={recommendations}
+          onAccept={(id) => handleRecommendationAction(id, true)}
+          onDecline={(id) => handleRecommendationAction(id, false)}
+        />
 
         {invoice && <InvoicePreview invoice={invoice} />}
 

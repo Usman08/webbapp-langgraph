@@ -71,3 +71,10 @@ async def recommend_products(customer_id: str, draft_product_ids: list[str]) -> 
         "recommend-products",
         {"customerId": customer_id, "draftProductIds": draft_product_ids},
     )
+
+
+async def save_recommendation(workflow_run_id: str, product_id: str, sku: str, basis: str) -> dict:
+    return await dotnet_client.post_tool(
+        "save-recommendation",
+        {"workflowRunId": workflow_run_id, "productId": product_id, "sku": sku, "basis": basis},
+    )

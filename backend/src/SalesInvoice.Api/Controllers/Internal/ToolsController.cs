@@ -12,7 +12,9 @@ public class ToolsController(
     ValidateInventoryHandler validateInventory,
     ResolveDiscountHandler resolveDiscount,
     BuildDraftHandler buildDraft,
-    RecordStepHandler recordStep) : ControllerBase
+    RecordStepHandler recordStep,
+    RecommendProductsHandler recommendProducts,
+    SaveRecommendationHandler saveRecommendation) : ControllerBase
 {
     [HttpPost("resolve-customer")]
     public async Task<IActionResult> ResolveCustomer([FromBody] ResolveCustomerRequest request)
@@ -41,4 +43,12 @@ public class ToolsController(
     [HttpPost("record-step")]
     public async Task<IActionResult> RecordStep([FromBody] RecordStepRequest request)
         => Ok(await recordStep.HandleAsync(request));
+
+    [HttpPost("recommend-products")]
+    public async Task<IActionResult> RecommendProducts([FromBody] RecommendProductsRequest request)
+        => Ok(await recommendProducts.HandleAsync(request));
+
+    [HttpPost("save-recommendation")]
+    public async Task<IActionResult> SaveRecommendation([FromBody] SaveRecommendationRequest request)
+        => Ok(await saveRecommendation.HandleAsync(request));
 }
