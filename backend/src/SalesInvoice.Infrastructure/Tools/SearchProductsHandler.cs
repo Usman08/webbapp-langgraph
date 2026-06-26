@@ -13,10 +13,11 @@ public class SearchProductsHandler(AppDbContext db)
 {
     public async Task<SearchProductsResponse> HandleAsync(SearchProductsRequest request)
     {
-        var hint = request.Hint.Trim().ToLower();
+        var hint = request.Hint.Trim();
 
+        // EF Core translates ILIKE on Postgres; OrdinalIgnoreCase signals case-insensitive intent.
         var matches = await db.Products
-            .Where(p => p.Sku.ToLower().Contains(hint) || p.Name.ToLower().Contains(hint))
+            .Where(p => EF.Functions.ILike(p.Sku, $"%{hint}%") || EF.Functions.ILike(p.Name, $"%{hint}%"))
             .OrderBy(p => p.Name)
             .Take(request.MaxResults)
             .Select(p => new ProductMatch(p.Id, p.Sku, p.Name, p.UnitPrice, p.InventoryQty))
