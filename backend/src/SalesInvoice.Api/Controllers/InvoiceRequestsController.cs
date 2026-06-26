@@ -38,8 +38,9 @@ public class InvoiceRequestsController(
         db.WorkflowRuns.Add(run);
         await db.SaveChangesAsync();
 
-        // Trigger the AI engine asynchronously (fire and forget)
-        _ = TriggerAiEngineAsync(run.Id, sanitised);
+        // Register the run with the AI engine before returning the streamUrl,
+        // so the client cannot connect to /stream before _pending_runs is populated.
+        await TriggerAiEngineAsync(run.Id, sanitised);
 
         return StatusCode(201, new
         {
