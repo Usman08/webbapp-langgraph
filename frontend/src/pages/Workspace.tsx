@@ -46,7 +46,7 @@ export function Workspace() {
   const [sseEvents, setSseEvents] = useState<WorkflowEvent[]>([]);
   const [steps, setSteps] = useState<WorkflowStep[]>([]);
   const [streamDone, setStreamDone] = useState(false);
-  const [disambigCandidates, setDisambigCandidates] = useState<{ id: string; name: string }[]>([]);
+  const [disambigCandidates, setDisambigCandidates] = useState<{ id: string; name: string; type: string }[]>([]);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [invoiceStatus, setInvoiceStatus] = useState<string>("Draft");
   const closeStreamRef = useRef<(() => void) | null>(null);
@@ -102,7 +102,7 @@ export function Workspace() {
           updateStep(event.data.name as string, { status: "failed" });
           break;
         case "needs_input":
-          setDisambigCandidates(event.data.candidates as { id: string; name: string }[]);
+          setDisambigCandidates(event.data.candidates as { id: string; name: string; type: string }[]);
           break;
         case "recommendation":
           setRecommendations((prev) => [
@@ -239,9 +239,10 @@ export function Workspace() {
 
         {parseError && (
           <div role="alert" className="text-error text-sm bg-error/10 rounded-lg p-3">
-            <strong>Could not understand request:</strong> {parseError.data.message as string}
-            {parseError.data.suggestion && (
-              <p className="mt-1 text-foreground-muted">{parseError.data.suggestion as string}</p>
+            <strong>Could not understand request:</strong>{" "}
+            {String(parseError.data.message ?? "")}
+            {parseError.data.suggestion != null && (
+              <p className="mt-1 text-foreground-muted">{String(parseError.data.suggestion)}</p>
             )}
           </div>
         )}

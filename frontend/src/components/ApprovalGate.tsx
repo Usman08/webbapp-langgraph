@@ -21,7 +21,7 @@ interface Props {
   onSaveEdits: (lines: EditableLine[]) => Promise<void>;
 }
 
-export function ApprovalGate({ invoiceId, invoiceStatus, lines, onApprove, onReject, onSaveEdits }: Props) {
+export function ApprovalGate({ invoiceStatus, lines, onApprove, onReject, onSaveEdits }: Props) {
   const [mode, setMode] = useState<"gate" | "editing">("gate");
   const [editLines, setEditLines] = useState<EditableLine[]>([]);
   const [confirmApprove, setConfirmApprove] = useState(false);
