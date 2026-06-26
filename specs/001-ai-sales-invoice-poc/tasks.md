@@ -26,14 +26,14 @@ integration, and E2E tests (≥80% domain/application coverage; E2E for every P1
 
 **Purpose**: Project initialization and scaffolding for all three components.
 
-- [ ] T001 Create repo solution layout (`backend/`, `ai-engine/`, `frontend/` dirs) and root `README.md` per plan.md Project Structure
-- [ ] T002 [P] Initialize .NET 8 solution with 4 projects (Api/Application/Domain/Infrastructure) + 2 test projects in `backend/` (`SalesInvoice.sln`)
-- [ ] T003 [P] Initialize Python 3.12 `ai-engine/` project with `pyproject.toml` (langgraph, langchain, langchain-groq, fastapi, uvicorn, httpx, sse-starlette, pytest)
-- [ ] T004 [P] Initialize React 18 + Vite + TypeScript app in `frontend/` with Tailwind, TanStack Query, React Router, Lucide (`frontend/package.json`, `vite.config.ts`)
-- [ ] T005 [P] Map design tokens from `design-system/ai-sales-invoice-poc/MASTER.md` into `frontend/tailwind.config.ts` (palette #0F172A/#334155/#0369A1/#F8FAFC/#020617, Plus Jakarta Sans)
-- [ ] T006 [P] Configure backend linting/formatting (`.editorconfig`, analyzers) and `Directory.Build.props` in `backend/`
-- [ ] T007 [P] Configure Python lint/format (ruff + black) and frontend ESLint/Prettier configs
-- [ ] T008 Create root `docker-compose.yml` (services: postgres, backend, ai-engine, frontend; ai-engine on internal network only) and `.env.example` (GROQ_API_KEY, GROQ_MODEL=openai/gpt-oss-120b, ENGINE_TOKEN, POSTGRES_*)
+- [X] T001 Create repo solution layout (`backend/`, `ai-engine/`, `frontend/` dirs) and root `README.md` per plan.md Project Structure
+- [X] T002 [P] Initialize .NET 8 solution with 4 projects (Api/Application/Domain/Infrastructure) + 2 test projects in `backend/` (`SalesInvoice.sln`)
+- [X] T003 [P] Initialize Python 3.12 `ai-engine/` project with `pyproject.toml` (langgraph, langchain, langchain-groq, fastapi, uvicorn, httpx, sse-starlette, pytest)
+- [X] T004 [P] Initialize React 18 + Vite + TypeScript app in `frontend/` with Tailwind, TanStack Query, React Router, Lucide (`frontend/package.json`, `vite.config.ts`)
+- [X] T005 [P] Map design tokens from `design-system/ai-sales-invoice-poc/MASTER.md` into `frontend/tailwind.config.ts` (palette #0F172A/#334155/#0369A1/#F8FAFC/#020617, Plus Jakarta Sans)
+- [X] T006 [P] Configure backend linting/formatting (`.editorconfig`, analyzers) and `Directory.Build.props` in `backend/`
+- [X] T007 [P] Configure Python lint/format (ruff + black) and frontend ESLint/Prettier configs
+- [X] T008 Create root `docker-compose.yml` (services: postgres, backend, ai-engine, frontend; ai-engine on internal network only) and `.env.example` (GROQ_API_KEY, GROQ_MODEL=openai/gpt-oss-120b, ENGINE_TOKEN, POSTGRES_*)
 
 **Checkpoint**: All three apps build/run empty; `docker compose up` starts Postgres.
 
@@ -47,35 +47,35 @@ integration, and E2E tests (≥80% domain/application coverage; E2E for every P1
 
 ### Domain entities & enums (backend/src/SalesInvoice.Domain)
 
-- [ ] T009 [P] Create enums `CustomerType`, `InvoiceStatus`, `LineStockStatus`, `RunStatus` in `backend/src/SalesInvoice.Domain/Enums/`
-- [ ] T010 [P] Create entity `Customer` in `backend/src/SalesInvoice.Domain/Entities/Customer.cs` (per data-model.md)
-- [ ] T011 [P] Create entities `Product` + `ProductAlternative` in `backend/src/SalesInvoice.Domain/Entities/`
-- [ ] T012 [P] Create entity `DiscountRule` in `backend/src/SalesInvoice.Domain/Entities/DiscountRule.cs`
-- [ ] T013 [P] Create entities `Invoice` + `InvoiceLineItem` in `backend/src/SalesInvoice.Domain/Entities/`
-- [ ] T014 [P] Create entities `WorkflowRun`, `WorkflowStep`, `ProductRecommendation` in `backend/src/SalesInvoice.Domain/Entities/`
+- [X] T009 [P] Create enums `CustomerType`, `InvoiceStatus`, `LineStockStatus`, `RunStatus` in `backend/src/SalesInvoice.Domain/Enums/`
+- [X] T010 [P] Create entity `Customer` in `backend/src/SalesInvoice.Domain/Entities/Customer.cs` (per data-model.md)
+- [X] T011 [P] Create entities `Product` + `ProductAlternative` in `backend/src/SalesInvoice.Domain/Entities/`
+- [X] T012 [P] Create entity `DiscountRule` in `backend/src/SalesInvoice.Domain/Entities/DiscountRule.cs`
+- [X] T013 [P] Create entities `Invoice` + `InvoiceLineItem` in `backend/src/SalesInvoice.Domain/Entities/`
+- [X] T014 [P] Create entities `WorkflowRun`, `WorkflowStep`, `ProductRecommendation` in `backend/src/SalesInvoice.Domain/Entities/`
 
 ### Domain business rules (single source of truth)
 
-- [ ] T015 [P] Implement `QuantityCalculator` (half-up percentage adjustment to whole units, FR-017) in `backend/src/SalesInvoice.Domain/Pricing/QuantityCalculator.cs`
-- [ ] T016 [P] Implement `InvoiceCalculator` (subtotal, discount, tax, total; ≤0.01 rounding, SC-006) in `backend/src/SalesInvoice.Domain/Pricing/InvoiceCalculator.cs`
-- [ ] T017 [P] Unit tests for `QuantityCalculator` + `InvoiceCalculator` in `backend/tests/SalesInvoice.UnitTests/Pricing/`
+- [X] T015 [P] Implement `QuantityCalculator` (half-up percentage adjustment to whole units, FR-017) in `backend/src/SalesInvoice.Domain/Pricing/QuantityCalculator.cs`
+- [X] T016 [P] Implement `InvoiceCalculator` (subtotal, discount, tax, total; ≤0.01 rounding, SC-006) in `backend/src/SalesInvoice.Domain/Pricing/InvoiceCalculator.cs`
+- [X] T017 [P] Unit tests for `QuantityCalculator` + `InvoiceCalculator` in `backend/tests/SalesInvoice.UnitTests/Pricing/`
 
 ### Persistence (backend/src/SalesInvoice.Infrastructure)
 
-- [ ] T018 Create `AppDbContext` with EF Core entity configurations (uuid PKs, numeric(12,2), jsonb, enums) in `backend/src/SalesInvoice.Infrastructure/Persistence/AppDbContext.cs`
-- [ ] T019 Add Npgsql + initial EF Core migration generating all tables in `backend/src/SalesInvoice.Infrastructure/Persistence/Migrations/`
-- [ ] T020 Implement idempotent `DbSeeder` (3 customers Retail/Wholesale/VIP, ~12 products incl. ≥2 out-of-stock + one with no in-stock alternative, discount rules, fixed tax, historical invoices with co-purchase patterns — FR-015/016/021) in `backend/src/SalesInvoice.Infrastructure/Persistence/DbSeeder.cs`
-- [ ] T021 Integration test (Testcontainers-Postgres) verifying seeder is idempotent and dataset matches FR-015/016 in `backend/tests/SalesInvoice.IntegrationTests/SeederTests.cs`
+- [X] T018 Create `AppDbContext` with EF Core entity configurations (uuid PKs, numeric(12,2), jsonb, enums) in `backend/src/SalesInvoice.Infrastructure/Persistence/AppDbContext.cs`
+- [X] T019 Add Npgsql + initial EF Core migration generating all tables in `backend/src/SalesInvoice.Infrastructure/Persistence/Migrations/`
+- [X] T020 Implement idempotent `DbSeeder` (3 customers Retail/Wholesale/VIP, ~12 products incl. ≥2 out-of-stock + one with no in-stock alternative, discount rules, fixed tax, historical invoices with co-purchase patterns — FR-015/016/021) in `backend/src/SalesInvoice.Infrastructure/Persistence/DbSeeder.cs`
+- [X] T021 Integration test (Testcontainers-Postgres) verifying seeder is idempotent and dataset matches FR-015/016 in `backend/tests/SalesInvoice.IntegrationTests/SeederTests.cs`
 
 ### Host wiring & cross-cutting
 
-- [ ] T022 Configure `Program.cs` (DI, DbContext, run migrations + seeder at startup, FluentValidation, problem+json errors, CORS for frontend) in `backend/src/SalesInvoice.Api/Program.cs`
-- [ ] T023 [P] Add `X-Engine-Token` auth handler for `/internal/tools/*` (env-configured, server-side only — Principle II) in `backend/src/SalesInvoice.Api/Security/EngineTokenMiddleware.cs`
-- [ ] T024 [P] Create reference endpoints `GET /api/customers` and `GET /api/products` in `backend/src/SalesInvoice.Api/Controllers/ReferenceController.cs`
-- [ ] T025 [P] Scaffold AI engine skeleton: FastAPI app, settings (env), `.NET` agent-tool httpx client with `X-Engine-Token` in `ai-engine/app/main.py` + `ai-engine/app/client.py`
-- [ ] T026 [P] Define LangGraph state schema (`WorkflowState`) and empty compiled graph stub in `ai-engine/app/graph/state.py` + `ai-engine/app/graph/build.py`
-- [ ] T027 [P] Create React app shell: router, TanStack Query provider, single workspace page layout, design-system base components (Button, Card, Panel) using tokens — mobile-first 375px in `frontend/src/App.tsx` + `frontend/src/design-system/`
-- [ ] T028 [P] Create typed REST API client + `EventSource` SSE client wrapper in `frontend/src/services/apiClient.ts` + `frontend/src/services/sseClient.ts`
+- [X] T022 Configure `Program.cs` (DI, DbContext, run migrations + seeder at startup, FluentValidation, problem+json errors, CORS for frontend) in `backend/src/SalesInvoice.Api/Program.cs`
+- [X] T023 [P] Add `X-Engine-Token` auth handler for `/internal/tools/*` (env-configured, server-side only — Principle II) in `backend/src/SalesInvoice.Api/Security/EngineTokenMiddleware.cs`
+- [X] T024 [P] Create reference endpoints `GET /api/customers` and `GET /api/products` in `backend/src/SalesInvoice.Api/Controllers/ReferenceController.cs`
+- [X] T025 [P] Scaffold AI engine skeleton: FastAPI app, settings (env), `.NET` agent-tool httpx client with `X-Engine-Token` in `ai-engine/app/main.py` + `ai-engine/app/client.py`
+- [X] T026 [P] Define LangGraph state schema (`WorkflowState`) and empty compiled graph stub in `ai-engine/app/graph/state.py` + `ai-engine/app/graph/build.py`
+- [X] T027 [P] Create React app shell: router, TanStack Query provider, single workspace page layout, design-system base components (Button, Card, Panel) using tokens — mobile-first 375px in `frontend/src/App.tsx` + `frontend/src/design-system/`
+- [X] T028 [P] Create typed REST API client + `EventSource` SSE client wrapper in `frontend/src/services/apiClient.ts` + `frontend/src/services/sseClient.ts`
 
 **Checkpoint**: Schema migrated + seeded; backend, ai-engine, and frontend boot; reference endpoints return seeded data.
 
@@ -89,38 +89,38 @@ integration, and E2E tests (≥80% domain/application coverage; E2E for every P1
 
 ### Agent-tool endpoints (.NET — business logic; contracts/agent-tools.md)
 
-- [ ] T029 [P] [US1] Implement `POST /internal/tools/resolve-customer` (resolved/ambiguous/not_found) in `backend/src/SalesInvoice.Api/Controllers/Internal/ToolsController.cs` + `backend/src/SalesInvoice.Application/Tools/ResolveCustomerHandler.cs`
-- [ ] T030 [P] [US1] Implement `POST /internal/tools/get-purchase-history` (most recent invoice + co-purchase stats) in `backend/src/SalesInvoice.Application/Tools/GetPurchaseHistoryHandler.cs`
-- [ ] T031 [P] [US1] Implement `POST /internal/tools/adjust-quantities` (uses `QuantityCalculator`) in `backend/src/SalesInvoice.Application/Tools/AdjustQuantitiesHandler.cs`
-- [ ] T032 [P] [US1] Implement `POST /internal/tools/validate-inventory` (InStock/AlternativeSuggested/BackOrder) in `backend/src/SalesInvoice.Application/Tools/ValidateInventoryHandler.cs`
-- [ ] T033 [P] [US1] Implement `POST /internal/tools/resolve-discount` (resolved/no_rule) in `backend/src/SalesInvoice.Application/Tools/ResolveDiscountHandler.cs`
-- [ ] T034 [US1] Implement `POST /internal/tools/build-draft` (persist Draft invoice + lines, compute totals via `InvoiceCalculator`) in `backend/src/SalesInvoice.Application/Tools/BuildDraftHandler.cs`
-- [ ] T035 [P] [US1] Integration tests for all six agent-tool endpoints against seeded Postgres in `backend/tests/SalesInvoice.IntegrationTests/ToolsTests.cs`
+- [X] T029 [P] [US1] Implement `POST /internal/tools/resolve-customer` (resolved/ambiguous/not_found) in `backend/src/SalesInvoice.Api/Controllers/Internal/ToolsController.cs` + `backend/src/SalesInvoice.Infrastructure/Tools/ResolveCustomerHandler.cs`
+- [X] T030 [P] [US1] Implement `POST /internal/tools/get-purchase-history` (most recent invoice + co-purchase stats) in `backend/src/SalesInvoice.Infrastructure/Tools/GetPurchaseHistoryHandler.cs`
+- [X] T031 [P] [US1] Implement `POST /internal/tools/adjust-quantities` (uses `QuantityCalculator`) in `backend/src/SalesInvoice.Application/Tools/AdjustQuantitiesHandler.cs`
+- [X] T032 [P] [US1] Implement `POST /internal/tools/validate-inventory` (InStock/AlternativeSuggested/BackOrder) in `backend/src/SalesInvoice.Infrastructure/Tools/ValidateInventoryHandler.cs`
+- [X] T033 [P] [US1] Implement `POST /internal/tools/resolve-discount` (resolved/no_rule) in `backend/src/SalesInvoice.Infrastructure/Tools/ResolveDiscountHandler.cs`
+- [X] T034 [US1] Implement `POST /internal/tools/build-draft` (persist Draft invoice + lines, compute totals via `InvoiceCalculator`) in `backend/src/SalesInvoice.Infrastructure/Tools/BuildDraftHandler.cs`
+- [X] T035 [P] [US1] Integration tests for all six agent-tool endpoints against seeded Postgres in `backend/tests/SalesInvoice.IntegrationTests/ToolsTests.cs`
 
 ### LangGraph workflow (ai-engine)
 
-- [ ] T036 [US1] Implement tool wrappers calling .NET agent-tools (resolve-customer, history, adjust, inventory, discount, build-draft) in `ai-engine/app/tools/`
-- [ ] T037 [US1] Implement graph nodes (intent parse → customer lookup → history → quantity adjust → inventory → discount → build draft) and wire edges in `ai-engine/app/graph/nodes.py` + `build.py`
-- [ ] T038 [US1] Bind Groq `openai/gpt-oss-120b` (via `langchain-groq` ChatGroq) with tool-use for structured intent extraction (R7) in `ai-engine/app/graph/llm.py`
-- [ ] T039 [US1] Implement `POST /run` engine endpoint that executes the graph for a request in `ai-engine/app/main.py`
-- [ ] T040 [P] [US1] pytest for graph happy-path with mocked LLM + mocked .NET tools in `ai-engine/tests/test_workflow_us1.py`
+- [X] T036 [US1] Implement tool wrappers calling .NET agent-tools (resolve-customer, history, adjust, inventory, discount, build-draft) in `ai-engine/app/tools/`
+- [X] T037 [US1] Implement graph nodes (intent parse → customer lookup → history → quantity adjust → inventory → discount → build draft) and wire edges in `ai-engine/app/graph/nodes.py` + `build.py`
+- [X] T038 [US1] Bind Groq `openai/gpt-oss-120b` (via `langchain-groq` ChatGroq) with tool-use for structured intent extraction (R7) in `ai-engine/app/graph/llm.py`
+- [X] T039 [US1] Implement `POST /run` engine endpoint that executes the graph for a request in `ai-engine/app/main.py`
+- [X] T040 [P] [US1] pytest for graph happy-path with mocked LLM + mocked .NET tools in `ai-engine/tests/test_workflow_us1.py`
 
 ### .NET request orchestration
 
-- [ ] T041 [US1] Implement `POST /api/invoices/requests` (create WorkflowRun, trigger ai-engine `/run`, return runId) in `backend/src/SalesInvoice.Api/Controllers/InvoiceRequestsController.cs`
-- [ ] T042 [US1] Implement `GET /api/invoices/requests/{runId}` (run state + draft + steps) and `GET /api/invoices/{invoiceId}` (full draft) in `backend/src/SalesInvoice.Api/Controllers/`
-- [ ] T043 [P] [US1] Implement `POST /api/invoices/requests/{runId}/disambiguate` (FR-018) in `InvoiceRequestsController.cs`
+- [X] T041 [US1] Implement `POST /api/invoices/requests` (create WorkflowRun, trigger ai-engine `/run`, return runId) in `backend/src/SalesInvoice.Api/Controllers/InvoiceRequestsController.cs`
+- [X] T042 [US1] Implement `GET /api/invoices/requests/{runId}` (run state + draft + steps) and `GET /api/invoices/{invoiceId}` (full draft) in `backend/src/SalesInvoice.Api/Controllers/`
+- [X] T043 [P] [US1] Implement `POST /api/invoices/requests/{runId}/disambiguate` (FR-018) in `InvoiceRequestsController.cs`
 
 ### Frontend (happy path)
 
-- [ ] T044 [P] [US1] Build `RequestBox` component (NL input, submit, char limit/sanitise) in `frontend/src/components/RequestBox.tsx`
-- [ ] T045 [P] [US1] Build `InvoicePreview` component (line items, totals, stock flags) in `frontend/src/components/InvoicePreview.tsx`
-- [ ] T046 [US1] Wire submit → poll/load draft → render preview on the workspace page in `frontend/src/pages/Workspace.tsx`
-- [ ] T047 [US1] Add customer disambiguation UI (FR-018) in `frontend/src/components/DisambiguationDialog.tsx`
+- [X] T044 [P] [US1] Build `RequestBox` component (NL input, submit, char limit/sanitise) in `frontend/src/components/RequestBox.tsx`
+- [X] T045 [P] [US1] Build `InvoicePreview` component (line items, totals, stock flags) in `frontend/src/components/InvoicePreview.tsx`
+- [X] T046 [US1] Wire submit → poll/load draft → render preview on the workspace page in `frontend/src/pages/Workspace.tsx`
+- [X] T047 [US1] Add customer disambiguation UI (FR-018) in `frontend/src/components/DisambiguationDialog.tsx`
 
 ### E2E
 
-- [ ] T048 [US1] Playwright E2E for V1 (ABC Traders → correct draft within 30s) AND US1 acceptance scenario 2 (an out-of-stock line is flagged with a suggested alternative in the draft) in `frontend/tests/e2e/us1-nl-request.spec.ts`
+- [X] T048 [US1] Playwright E2E for V1 (ABC Traders → correct draft within 30s) AND US1 acceptance scenario 2 (an out-of-stock line is flagged with a suggested alternative in the draft) in `frontend/tests/e2e/us1-nl-request.spec.ts`
 
 **Checkpoint**: US1 fully functional and independently testable — MVP ready.
 

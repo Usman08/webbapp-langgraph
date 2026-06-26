@@ -1,0 +1,6 @@
+<Project>
+  <!-- Test projects use Arrange_Act_Assert naming; suppress CA1707 (underscores in identifiers) -->
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CA1707</NoWarn>
+  </PropertyGroup>
+</Project>
